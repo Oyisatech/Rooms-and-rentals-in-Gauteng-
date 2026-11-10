@@ -6,22 +6,84 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Landlord Dashboard | Gauteng Rentals</title>
 <link rel="stylesheet" href="style.css">
+
 <style>
-main { max-width:900px; margin:35px auto; padding:20px; }
-.panel { background:white; padding:22px; border-radius:12px; margin-bottom:25px; box-shadow:0 3px 15px #0000000d; }
+main {
+  max-width:900px;
+  margin:35px auto;
+  padding:20px;
+}
+.panel {
+  background:white;
+  padding:22px;
+  border-radius:12px;
+  margin-bottom:25px;
+  box-shadow:0 3px 15px #0000000d;
+}
 .panel input, .panel textarea, .panel select {
-  width:100%; padding:13px; margin:8px 0 15px;
-  border:1px solid #ddd; border-radius:7px; font-size:15px;
+  box-sizing:border-box;
+  width:100%;
+  padding:13px;
+  margin:8px 0 15px;
+  border:1px solid #ddd;
+  border-radius:7px;
+  font-size:15px;
 }
 .panel button {
-  background:#123b32; color:white; border:0;
-  border-radius:7px; padding:13px 20px; font-weight:bold;
+  background:#123b32;
+  color:white;
+  border:0;
+  border-radius:7px;
+  padding:13px 20px;
+  font-weight:bold;
+  cursor:pointer;
 }
-.listing { border:1px solid #e5e5e5; padding:15px; border-radius:9px; margin:12px 0; }
-.status { font-weight:bold; color:#9b7014; }
-#message { margin-top:15px; overflow-wrap:anywhere; }
+.panel button:disabled {
+  opacity:.5;
+}
+.upload-box {
+  border:2px dashed #123b32;
+  border-radius:10px;
+  padding:20px;
+  text-align:center;
+  margin:10px 0 15px;
+}
+#photoPreview {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:10px;
+}
+#photoPreview img {
+  width:100%;
+  height:110px;
+  object-fit:cover;
+  border-radius:8px;
+}
+.listing {
+  border:1px solid #e5e5e5;
+  padding:15px;
+  border-radius:9px;
+  margin:12px 0;
+}
+.listing img {
+  width:100%;
+  max-width:180px;
+  height:120px;
+  object-fit:cover;
+  border-radius:8px;
+  margin:5px;
+}
+.status {
+  font-weight:bold;
+  color:#9b7014;
+}
+#message {
+  margin-top:15px;
+  overflow-wrap:anywhere;
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -73,10 +135,25 @@ placeholder="e.g. Spacious room in Roodepoort">
 <textarea id="description" rows="4" maxlength="2000"
 placeholder="Describe the property, facilities and rental conditions"></textarea>
 
-<label>Property photo URL (optional)</label>
-<input id="photo" type="url" placeholder="https://example.com/photo.jpg">
+<label>Property photos</label>
 
-<button type="submit" id="submitButton">Submit property</button>
+<div class="upload-box">
+  <p>📸 Choose photos from your phone</p>
+  <input
+    id="photos"
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    multiple
+  >
+  <p>Choose up to 5 photos. Maximum 5MB each.</p>
+</div>
+
+<div id="photoPreview"></div>
+
+<button type="submit" id="submitButton">
+Submit property
+</button>
+
 <p id="message" role="status" aria-live="polite"></p>
 
 </form>
@@ -95,9 +172,19 @@ placeholder="Describe the property, facilities and rental conditions"></textarea
 <script>
 const db = window.supabaseClient;
 const message = document.getElementById("message");
+const photoInput = document.getElementById("photos");
+const preview = document.getElementById("photoPreview");
+
 let currentUser = null;
 
+const BUCKET = "property-photos";
+
 async function startDashboard() {
+  if (!db) {
+    message.textContent = "Supabase connection is missing.";
+    return;
+  }
+
   const { data, error } = await db.auth.getUser();
 
   if (error || !data.user) {
@@ -106,9 +193,80 @@ async function startDashboard() {
   }
 
   currentUser = data.user;
-  loadMyProperties();
+  await loadMyProperties();
 }
 
+// Preview selected photos
+photoInput.addEventListener("change", () => {
+  preview.innerHTML = "";
+
+  const files = Array.from(photoInput.files || []);
+
+  if (files.length > 5) {
+    alert("Please select no more than 5 photos.");
+    photoInput.value = "";
+    return;
+  }
+
+  for (const file of files) {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      alert("Only JPG, PNG and WebP photos are allowed.");
+      photoInput.value = "";
+      preview.innerHTML = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Each photo must be smaller than 5MB.");
+      photoInput.value = "";
+      preview.innerHTML = "";
+      return;
+    }
+  }
+
+  files.forEach(file => {
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.alt = "Property photo preview";
+    preview.appendChild(img);
+  });
+});
+
+// Upload photos directly to Supabase Storage
+async function uploadPhotos(files) {
+  const imageUrls = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+    const filePath =
+      currentUser.id + "/" + Date.now() + "-" + i + "-" + safeName;
+
+    const { error } = await db.storage
+      .from(BUCKET)
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type
+      });
+
+    if (error) {
+      throw new Error("Photo upload failed: " + error.message);
+    }
+
+    const { data } = db.storage
+      .from(BUCKET)
+      .getPublicUrl(filePath);
+
+    imageUrls.push(data.publicUrl);
+  }
+
+  return imageUrls;
+}
+
+// Load landlord listings
 async function loadMyProperties() {
   const container = document.getElementById("myProperties");
 
@@ -126,7 +284,8 @@ async function loadMyProperties() {
   container.innerHTML = "";
 
   if (!data || data.length === 0) {
-    container.textContent = "You haven't submitted any properties yet.";
+    container.textContent =
+      "You haven't submitted any properties yet.";
     return;
   }
 
@@ -138,30 +297,60 @@ async function loadMyProperties() {
     title.textContent = property.title;
 
     const location = document.createElement("p");
-    location.textContent = [property.suburb, property.city]
-      .filter(Boolean).join(", ");
+    location.textContent =
+      [property.suburb, property.city].filter(Boolean).join(", ");
 
     const price = document.createElement("p");
-    price.textContent = "R" + Number(property.rent).toLocaleString("en-ZA") + " per month";
+    price.textContent =
+      "R" + Number(property.rent).toLocaleString("en-ZA") +
+      " per month";
 
     const status = document.createElement("p");
     status.className = "status";
     status.textContent = "Status: " + property.status;
 
     card.append(title, location, price, status);
+
+    if (Array.isArray(property.image_urls)) {
+      property.image_urls.forEach(url => {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "Property photo";
+        img.loading = "lazy";
+        card.appendChild(img);
+      });
+    }
+
     container.appendChild(card);
   });
 }
 
-document.getElementById("propertyForm").addEventListener("submit", async event => {
+// Submit property and photos
+document.getElementById("propertyForm")
+.addEventListener("submit", async event => {
+
   event.preventDefault();
+
+  if (!currentUser) {
+    message.textContent = "Please log in again.";
+    return;
+  }
 
   const button = document.getElementById("submitButton");
   button.disabled = true;
-  message.textContent = "Submitting your property...";
 
   try {
-    const photo = document.getElementById("photo").value.trim();
+    const files = Array.from(photoInput.files || []);
+
+    if (files.length > 5) {
+      throw new Error("Maximum 5 photos allowed.");
+    }
+
+    message.textContent = "Uploading property photos...";
+
+    const imageUrls = await uploadPhotos(files);
+
+    message.textContent = "Saving your property...";
 
     const listing = {
       owner_id: currentUser.id,
@@ -175,7 +364,7 @@ document.getElementById("propertyForm").addEventListener("submit", async event =
       bathrooms: Number(document.getElementById("bathrooms").value),
       contact_phone: document.getElementById("phone").value.trim(),
       description: document.getElementById("description").value.trim(),
-      image_urls: photo ? [photo] : [],
+      image_urls: imageUrls,
       status: "pending"
     };
 
@@ -189,6 +378,8 @@ document.getElementById("propertyForm").addEventListener("submit", async event =
       "Success! Your property has been submitted for admin approval.";
 
     event.target.reset();
+    preview.innerHTML = "";
+
     await loadMyProperties();
 
   } catch (error) {
@@ -198,7 +389,10 @@ document.getElementById("propertyForm").addEventListener("submit", async event =
   }
 });
 
-document.getElementById("logoutButton").addEventListener("click", async () => {
+// Logout
+document.getElementById("logoutButton")
+.addEventListener("click", async () => {
+
   const { error } = await db.auth.signOut();
 
   if (error) {
@@ -213,4 +407,5 @@ startDashboard();
 </script>
 
 </body>
-</html>
+  </html>
+                              
