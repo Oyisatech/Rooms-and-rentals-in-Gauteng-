@@ -26,6 +26,8 @@ header p { color:#ccc; margin-top:5px; }
 .wa { display:block; background:#25D366; color:white; text-align:center; padding:12px; border-radius:8px; text-decoration:none; font-weight:bold; margin-top:10px; }
 .list-btn { display:block; background:#111; color:white; text-align:center; padding:14px; border-radius:10px; text-decoration:none; font-weight:bold; margin:0 15px 20px; }
 footer { text-align:center; padding:20px; color:#777; font-size:13px; }
+#noResults { display:none; text-align:center; padding:30px; background:white; margin:0 15px 20px; border-radius:12px; }
+#noResults button { background:#111; color:white; border:none; padding:12px 20px; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer; }
 @media(min-width:600px){ .rooms{grid-template-columns:1fr 1fr;} }
 @media(min-width:900px){ .rooms{grid-template-columns:1fr 1fr 1fr;} .search{display:flex; gap:10px;} .search input,.search select,.search button{margin:0;} }
 </style>
@@ -40,12 +42,18 @@ footer { text-align:center; padding:20px; color:#777; font-size:13px; }
 <div class="search">
   <input type="text" id="searchInput" placeholder="Search area... e.g. Roodepoort">
   <select id="priceFilter">
-    <option value="99999">Any Price</option>
+    <option value="99999" selected>Any Price</option>
     <option value="1500">Under R1500</option>
     <option value="2000">Under R2000</option>
     <option value="2500">Under R2500</option>
   </select>
   <button onclick="filterRooms()">Search Rooms</button>
+</div>
+
+<div id="noResults">
+  <h3>No rooms found for that search 😔</h3>
+  <p style="margin:10px 0; color:#555;">Try "Any Price" or search "Roodepoort" only.</p>
+  <button onclick="resetSearch()">Show All Rooms</button>
 </div>
 
 <div class="rooms" id="roomsList">
@@ -118,7 +126,7 @@ footer { text-align:center; padding:20px; color:#777; font-size:13px; }
 
 </div>
 
-<a class="list-btn" href="https://forms.gle/your-google-form-link">+ List Your Room - FREE for First Month</a>
+<a class="list-btn" href="https://wa.me/27600000000?text=Hi OyisaTech, I want to list my room on Rooms and Rentals. Area: , Price: R , Photos:">+ List Your Room - FREE for First Month</a>
 
 <footer>
   Made by OyisaTech | Rooms and Rentals - Roodepoort<br>
@@ -130,12 +138,20 @@ function filterRooms(){
   let search = document.getElementById('searchInput').value.toLowerCase();
   let maxPrice = parseInt(document.getElementById('priceFilter').value);
   let cards = document.querySelectorAll('.card');
+  let found = 0;
   cards.forEach(card => {
     let area = card.getAttribute('data-area');
     let price = parseInt(card.getAttribute('data-price'));
     let show = area.includes(search) && price <= maxPrice;
     card.style.display = show ? 'block' : 'none';
+    if(show) found++;
   });
+  document.getElementById('noResults').style.display = found === 0 ? 'block' : 'none';
+}
+function resetSearch(){
+  document.getElementById('searchInput').value = '';
+  document.getElementById('priceFilter').value = '99999';
+  filterRooms();
 }
 </script>
 
