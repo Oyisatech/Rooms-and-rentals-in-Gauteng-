@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landlord Account | Gauteng Rentals</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.auth-container {
+  max-width: 480px;
+  margin: 55px auto;
+  padding: 25px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 5px 25px rgba(0,0,0,.07);
+}
+.auth-container h1 { margin-bottom: 10px; }
+.auth-container p { color: #68766f; }
+.auth-container input {
+  width: 100%;
+  padding: 14px;
+  margin: 9px 0;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  font-size: 15px;
+}
+.auth-container button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  background: #123b32;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  font-size: 16px;
+}
+.switch {
+  text-align: center;
+  margin-top: 20px;
+}
+.switch button {
+  background: transparent;
+  color: #16734d;
+  padding: 5px;
+}
+#message {
+  margin-top: 15px;
+  overflow-wrap: anywhere;
+}
+</style>
+</head>
+<body>
+
+<header>
+<a href="index.html" class="logo">🏠 Gauteng Rentals</a>
+<a href="index.html" style="color:white">Home</a>
+</header>
+
+<div class="auth-container">
+
+<h1 id="heading">Landlord Registration</h1>
+<p id="subtitle">Create an account to advertise your property.</p>
+
+<form id="authForm">
+
+<div id="nameField">
+<input id="fullName" type="text"
+placeholder="Full name" required>
+</div>
+
+<div id="phoneField">
+<input id="phone" type="tel"
+placeholder="WhatsApp number" required>
+</div>
+
+<input id="email" type="email"
+placeholder="Email address" required>
+
+<input id="password" type="password"
+placeholder="Password (minimum 8 characters)"
+minlength="8" required>
+
+<button type="submit" id="submitButton">
+Create account
+</button>
+
+</form>
+
+<p id="message" role="status" aria-live="polite"></p>
+
+<div class="switch">
+<p id="switchText">Already have an account?</p>
+<button type="button" id="switchButton">
+Login here
+</button>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<script>
+const form = document.getElementById("authForm");
+const message = document.getElementById("message");
+
+let loginMode = false;
+
+document.getElementById("switchButton").onclick = () => {
+  loginMode = !loginMode;
+
+  document.getElementById("heading").textContent =
+    loginMode ? "Landlord Login" : "Landlord Registration";
+
+  document.getElementById("subtitle").textContent =
+    loginMode ? "Access your landlord account." :
+    "Create an account to advertise your property.";
+
+  document.getElementById("nameField").hidden = loginMode;
+  document.getElementById("phoneField").hidden = loginMode;
+
+  document.getElementById("fullName").required = !loginMode;
+  document.getElementById("phone").required = !loginMode;
+
+  document.getElementById("submitButton").textContent =
+    loginMode ? "Login" : "Create account";
+
+  document.getElementById("switchText").textContent =
+    loginMode ? "New landlord?" : "Already have an account?";
+
+  document.getElementById("switchButton").textContent =
+    loginMode ? "Register here" : "Login here";
+
+  message.textContent = "";
+};
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const button = document.getElementById("submitButton");
+  button.disabled = true;
+  message.textContent = "Please wait...";
+
+  try {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (loginMode) {
+      const { data, error } =
+        await window.supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) throw error;
+
+      message.textContent = "Login successful! Opening your dashboard...";
+
+      window.location.href = "dashboard.html";
+
+    } else {
+      const fullName = document.getElementById("fullName").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      const { data, error } =
+        await window.supabaseClient.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              phone: phone,
+              role: "landlord"
+            }
+          }
+        });
+
+      if (error) throw error;
+
+      if (data.session) {
+        message.textContent =
+          "Account created! You can now continue to your dashboard.";
+      } else {
+        message.textContent =
+          "Registration received! Check your email to confirm your account before logging in.";
+      }
+    }
+
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+</script>
+
+</body>
+  </html>
+  
