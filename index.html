@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Find affordable rooms, flats and houses for rent across Gauteng. Gauteng Rooms & Rentals by OyisaTech.">
+<title>Gauteng Rooms & Rentals | OyisaTech</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">🏠 Gauteng Rentals</a>
+  <nav>
+    <a href="#properties">Find a home</a>
+    <a href="#how">How it works</a>
+    <a href="#landlord" class="nav-btn">List your property</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-content">
+    <span class="tag">YOUR NEXT HOME STARTS HERE</span>
+    <h1>Find a place<br>to call <span>home.</span></h1>
+    <p>Discover rooms, flats and houses for rent across Gauteng.</p>
+
+    <form id="searchForm" class="search-box">
+      <input id="locationSearch" placeholder="Enter suburb or city">
+      <select id="categorySearch">
+        <option value="">All properties</option>
+        <option>Room</option>
+        <option>Flat</option>
+        <option>Apartment</option>
+        <option>House</option>
+      </select>
+      <button type="submit">Search</button>
+    </form>
+  </div>
+</section>
+
+<section class="categories">
+  <h2>Explore properties</h2>
+  <div class="category-grid">
+    <button data-category="Room">🛏️<br>Rooms</button>
+    <button data-category="Flat">🏢<br>Flats</button>
+    <button data-category="Apartment">🏙️<br>Apartments</button>
+    <button data-category="House">🏡<br>Houses</button>
+  </div>
+</section>
+
+<section id="properties" class="properties">
+  <div class="section-heading">
+    <div>
+      <span class="tag">FIND YOUR SPACE</span>
+      <h2>Available rentals</h2>
+    </div>
+    <span id="resultCount">0 properties</span>
+  </div>
+
+  <div id="propertyList" class="property-grid">
+    <p>Loading properties...</p>
+  </div>
+</section>
+
+<section id="landlord" class="landlord">
+  <h2>Are you a landlord?</h2>
+  <p>Advertise your room, flat or house and connect with people looking for a home.</p>
+  <a href="landlord.html" class="white-btn">List your property</a>
+</section>
+
+<section id="how" class="how">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div><h3>01</h3><b>Search</b><p>Find rentals in your preferred area.</p></div>
+    <div><h3>02</h3><b>Explore</b><p>View prices, photos and descriptions.</p></div>
+    <div><h3>03</h3><b>Connect</b><p>Contact the landlord directly.</p></div>
+  </div>
+</section>
+
+<footer>
+  <h3>Gauteng Rooms & Rentals</h3>
+  <p>Powered by OyisaTech | Dream. Build. Grow.</p>
+  <p>© 2026 OyisaTech. All rights reserved.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+  </html>
+  
