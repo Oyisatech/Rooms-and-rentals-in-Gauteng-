@@ -2,393 +2,319 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landlord Registration | Gauteng Rentals</title>
 
-<title>Landlord Account | Gauteng Rentals</title>
+  <style>
+    * { box-sizing: border-box; }
 
-<link rel="stylesheet" href="style.css">
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 20px;
+    }
 
-<style>
-.auth-container {
-  box-sizing: border-box;
-  max-width: 480px;
-  margin: 55px auto;
-  padding: 25px;
-  background: white;
-  border-radius: 14px;
-  box-shadow: 0 5px 25px rgba(0,0,0,.07);
-}
+    .container {
+      max-width: 430px;
+      margin: 35px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
 
-.auth-container h1 {
-  margin-bottom: 10px;
-}
+    h2 { text-align: center; color: #123b2b; }
 
-.auth-container p {
-  color: #68766f;
-}
+    input {
+      width: 100%;
+      padding: 13px;
+      margin: 9px 0;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      font-size: 16px;
+    }
 
-.auth-container input:not([type="checkbox"]) {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 14px;
-  margin: 9px 0;
-  border: 1px solid #ddd;
-  border-radius: 7px;
-  font-size: 15px;
-}
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 7px;
+      background: #137547;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-.auth-container button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  background: #123b32;
-  color: white;
-  border: none;
-  border-radius: 7px;
-  font-size: 16px;
-  cursor: pointer;
-}
+    .switch {
+      background: none;
+      color: #137547;
+      text-decoration: underline;
+    }
 
-.auth-container button:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-}
+    .message {
+      padding: 12px;
+      border-radius: 7px;
+      margin: 12px 0;
+      display: none;
+      line-height: 1.5;
+    }
 
-.switch {
-  text-align: center;
-  margin-top: 20px;
-}
+    .success {
+      background: #e5f7eb;
+      color: #126334;
+    }
 
-.switch button {
-  background: transparent;
-  color: #16734d;
-  padding: 5px;
-}
+    .error {
+      background: #ffe8e8;
+      color: #a40000;
+    }
 
-.password-option {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin: 12px 0;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-}
+    .show-password {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
 
-.password-option input {
-  width: 18px;
-  height: 18px;
-}
-
-#message {
-  margin-top: 15px;
-  overflow-wrap: anywhere;
-}
-</style>
+    .show-password input {
+      width: auto;
+      margin: 0;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-<a href="index.html" class="logo">🏠 Gauteng Rentals</a>
-<a href="index.html" style="color:white">Home</a>
-</header>
+<div class="container">
+  <h2 id="heading">Landlord Registration</h2>
 
-<div class="auth-container">
+  <div id="message" class="message"></div>
 
-<h1 id="heading">Landlord Registration</h1>
+  <form id="authForm">
 
-<p id="subtitle">
-Create an account to advertise your property.
-</p>
+    <div id="nameField">
+      <input id="fullName" type="text"
+        placeholder="Full name">
+    </div>
 
-<form id="authForm">
+    <div id="phoneField">
+      <input id="phone" type="tel"
+        placeholder="WhatsApp number">
+    </div>
 
-<div id="nameField">
-<input
-id="fullName"
-type="text"
-placeholder="Full name"
-autocomplete="name"
-required>
-</div>
+    <input id="email" type="email"
+      placeholder="Email address" required>
 
-<div id="phoneField">
-<input
-id="phone"
-type="tel"
-placeholder="WhatsApp number"
-autocomplete="tel"
-required>
-</div>
+    <input id="password" type="password"
+      placeholder="Password (minimum 8 characters)"
+      required>
 
-<input
-id="email"
-type="email"
-placeholder="Email address"
-autocomplete="email"
-required>
+    <div id="confirmField">
+      <input id="confirmPassword" type="password"
+        placeholder="Confirm password">
+    </div>
 
-<input
-id="password"
-type="password"
-placeholder="Password (minimum 8 characters)"
-minlength="8"
-autocomplete="new-password"
-required>
+    <label class="show-password">
+      <input type="checkbox" id="showPassword">
+      Show passwords
+    </label>
 
-<div id="confirmField">
+    <button type="submit" id="submitButton">
+      Register
+    </button>
+  </form>
 
-<input
-id="confirmPassword"
-type="password"
-placeholder="Confirm password"
-minlength="8"
-autocomplete="new-password"
-required>
-
-</div>
-
-<label class="password-option">
-<input type="checkbox" id="showPassword">
-Show passwords
-</label>
-
-<button type="submit" id="submitButton">
-Create account
-</button>
-
-</form>
-
-<p id="message" role="status" aria-live="polite"></p>
-
-<div class="switch">
-
-<p id="switchText">
-Already have an account?
-</p>
-
-<button type="button" id="switchButton">
-Login here
-</button>
-
-</div>
-
+  <button class="switch" type="button" id="switchButton">
+    Already have an account? Log in
+  </button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <script>
+  const form = document.getElementById("authForm");
+  const heading = document.getElementById("heading");
+  const message = document.getElementById("message");
+  const submitButton = document.getElementById("submitButton");
+  const switchButton = document.getElementById("switchButton");
 
-// Elements
+  const nameField = document.getElementById("nameField");
+  const phoneField = document.getElementById("phoneField");
+  const confirmField = document.getElementById("confirmField");
 
-const form = document.getElementById("authForm");
-const message = document.getElementById("message");
+  const fullName = document.getElementById("fullName");
+  const phone = document.getElementById("phone");
+  const email = document.getElementById("email");
+  const password = document.getElementById("password");
+  const confirmPassword = document.getElementById("confirmPassword");
+  const showPassword = document.getElementById("showPassword");
 
-const passwordInput = document.getElementById("password");
-const confirmPasswordInput =
-document.getElementById("confirmPassword");
+  let loginMode = false;
 
-const showPasswordCheckbox =
-document.getElementById("showPassword");
+  function showMessage(text, type) {
+    message.textContent = text;
+    message.className = "message " + type;
+    message.style.display = "block";
+  }
 
-let loginMode = false;
+  function setLoginMode(value) {
+    loginMode = value;
 
+    heading.textContent = loginMode
+      ? "Landlord Login"
+      : "Landlord Registration";
 
-// SHOW AND HIDE PASSWORDS
+    submitButton.textContent = loginMode
+      ? "Log In"
+      : "Register";
 
-showPasswordCheckbox.addEventListener("change", function() {
+    nameField.style.display = loginMode ? "none" : "block";
+    phoneField.style.display = loginMode ? "none" : "block";
+    confirmField.style.display = loginMode ? "none" : "block";
 
-  const passwordType = this.checked ? "text" : "password";
+    fullName.required = !loginMode;
+    phone.required = !loginMode;
+    confirmPassword.required = !loginMode;
 
-  passwordInput.type = passwordType;
-  confirmPasswordInput.type = passwordType;
+    switchButton.textContent = loginMode
+      ? "Don't have an account? Register"
+      : "Already have an account? Log in";
 
-});
+    showPassword.checked = false;
+    password.type = "password";
+    confirmPassword.type = "password";
+  }
 
+  switchButton.addEventListener("click", function() {
+    setLoginMode(!loginMode);
+    message.style.display = "none";
+  });
 
-// SWITCH BETWEEN REGISTRATION AND LOGIN
+  showPassword.addEventListener("change", function() {
+    const type = this.checked ? "text" : "password";
+    password.type = type;
+    confirmPassword.type = type;
+  });
 
-document.getElementById("switchButton").onclick = function() {
+  // Detect return from the email confirmation link.
+  const queryParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(
+    window.location.hash.replace(/^#/, "")
+  );
 
-  loginMode = !loginMode;
+  const confirmationReturned =
+    queryParams.has("code") ||
+    hashParams.get("type") === "signup";
 
-  document.getElementById("heading").textContent =
-    loginMode ? "Landlord Login" : "Landlord Registration";
+  const confirmationError =
+    queryParams.get("error_description") ||
+    hashParams.get("error_description");
 
-  document.getElementById("subtitle").textContent =
-    loginMode
-    ? "Access your landlord account."
-    : "Create an account to advertise your property.";
+  if (confirmationError) {
+    showMessage(
+      "Email confirmation could not be completed: " +
+      confirmationError,
+      "error"
+    );
+    setLoginMode(false);
+  } else if (confirmationReturned) {
+    setLoginMode(true);
+    showMessage(
+      "Email confirmed successfully! You can now log in.",
+      "success"
+    );
+  }
 
-  document.getElementById("nameField").hidden = loginMode;
-  document.getElementById("phoneField").hidden = loginMode;
-  document.getElementById("confirmField").hidden = loginMode;
+  form.addEventListener("submit", async function(event) {
+    event.preventDefault();
 
-  document.getElementById("fullName").required = !loginMode;
-  document.getElementById("phone").required = !loginMode;
-  confirmPasswordInput.required = !loginMode;
+    const client = window.supabaseClient;
 
-  showPasswordCheckbox.checked = false;
-
-  passwordInput.type = "password";
-  confirmPasswordInput.type = "password";
-
-  document.getElementById("submitButton").textContent =
-    loginMode ? "Login" : "Create account";
-
-  document.getElementById("switchText").textContent =
-    loginMode ? "New landlord?" : "Already have an account?";
-
-  document.getElementById("switchButton").textContent =
-    loginMode ? "Register here" : "Login here";
-
-  message.textContent = "";
-
-};
-
-
-// REGISTRATION AND LOGIN
-
-form.addEventListener("submit", async function(event) {
-
-  event.preventDefault();
-
-  const button = document.getElementById("submitButton");
-
-  button.disabled = true;
-  message.textContent = "Please wait...";
-
-  try {
-
-    // Check Supabase connection
-
-    if (!window.supabaseClient) {
-      throw new Error(
-        "Supabase connection failed. Please refresh the page."
+    if (!client) {
+      showMessage(
+        "Connection problem. Please check your Supabase setup.",
+        "error"
       );
+      return;
     }
 
-    const email =
-      document.getElementById("email").value.trim();
+    const userEmail = email.value.trim();
+    const userPassword = password.value;
 
-    const password = passwordInput.value;
+    submitButton.disabled = true;
+    submitButton.textContent = "Please wait...";
 
-    const confirmPassword = confirmPasswordInput.value;
+    try {
+      if (loginMode) {
+        const { data, error } =
+          await client.auth.signInWithPassword({
+            email: userEmail,
+            password: userPassword
+          });
 
+        if (error) throw error;
 
-    // PASSWORD VALIDATION
+        showMessage("Login successful! Opening your dashboard...", "success");
 
-    if (!loginMode && password.length < 8) {
-      throw new Error(
-        "Password must contain at least 8 characters."
-      );
-    }
-
-    if (!loginMode && password !== confirmPassword) {
-      throw new Error(
-        "Passwords do not match. Please try again."
-      );
-    }
-
-
-    // LANDLORD LOGIN
-
-    if (loginMode) {
-
-      const { data, error } =
-        await window.supabaseClient.auth.signInWithPassword({
-
-          email: email,
-          password: password
-
-        });
-
-      if (error) throw error;
-
-      message.textContent =
-        "Login successful! Opening your dashboard...";
-
-      window.location.href = "dashboard.html";
-
-    }
-
-
-    // LANDLORD REGISTRATION
-
-    else {
-
-      const fullName =
-        document.getElementById("fullName").value.trim();
-
-      const phone =
-        document.getElementById("phone").value.trim();
-
-      if (!fullName || !phone) {
-        throw new Error(
-          "Please enter your full name and WhatsApp number."
-        );
-      }
-
-      const { data, error } =
-        await window.supabaseClient.auth.signUp({
-
-          email: email,
-          password: password,
-
-          options: {
-
-            emailRedirectTo:
-              "https://oyisatech.github.io/Rooms-and-rentals-in-Gauteng-/landlord.html",
-
-            data: {
-              full_name: fullName,
-              phone: phone,
-              role: "landlord"
-            }
-
-          }
-
-        });
-
-      if (error) throw error;
-
-      if (data.session) {
-
-        message.textContent =
-          "Account created successfully! You can now continue.";
+        window.location.href = "dashboard.html";
 
       } else {
+        if (userPassword.length < 8) {
+          throw new Error("Your password must have at least 8 characters.");
+        }
 
-        message.textContent =
-          "Registration received! Check your email to confirm your account before logging in.";
+        if (userPassword !== confirmPassword.value) {
+          throw new Error("Your passwords do not match.");
+        }
 
+        const { data, error } = await client.auth.signUp({
+          email: userEmail,
+          password: userPassword,
+          options: {
+            data: {
+              full_name: fullName.value.trim(),
+              phone: phone.value.trim(),
+              role: "landlord"
+            },
+            emailRedirectTo:
+              "https://oyisatech.github.io/Rooms-and-rentals-in-Gauteng-/landlord.html"
+          }
+        });
+
+        if (error) throw error;
+
+        if (data.session) {
+          showMessage(
+            "Account created successfully! You can now log in.",
+            "success"
+          );
+          setLoginMode(true);
+        } else {
+          showMessage(
+            "Registration received! Check your email and click the confirmation link. Then return here to log in.",
+            "success"
+          );
+        }
       }
 
+    } catch (error) {
+      showMessage(error.message, "error");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = loginMode ? "Log In" : "Register";
     }
-
-  }
-
-  catch(error) {
-
-    message.textContent = error.message;
-
-  }
-
-  finally {
-
-    button.disabled = false;
-
-  }
-
-});
-
+  });
 </script>
 
 </body>
-  </html>
+</html>
+
   
 
   
