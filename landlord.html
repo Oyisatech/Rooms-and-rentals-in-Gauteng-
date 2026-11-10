@@ -7,100 +7,100 @@
 <title>Landlord Account | Gauteng Rentals</title>
 
 <style>
-* { box-sizing:border-box; }
+* { box-sizing: border-box; }
 
 body {
-  font-family:Arial,sans-serif;
-  background:#f1f5f9;
-  margin:0;
-  padding:20px;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  margin: 0;
+  padding: 20px;
 }
 
 .container {
-  max-width:430px;
-  margin:35px auto;
-  background:white;
-  padding:25px;
-  border-radius:12px;
-  box-shadow:0 4px 15px rgba(0,0,0,.08);
+  max-width: 430px;
+  margin: 35px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,.08);
 }
 
 h2 {
-  text-align:center;
-  color:#123b2b;
+  text-align: center;
+  color: #123b2b;
 }
 
 input {
-  width:100%;
-  padding:13px;
-  margin:9px 0;
-  border:1px solid #ccc;
-  border-radius:7px;
-  font-size:16px;
+  width: 100%;
+  padding: 13px;
+  margin: 9px 0;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 16px;
 }
 
 button {
-  width:100%;
-  padding:14px;
-  margin-top:12px;
-  border:none;
-  border-radius:7px;
-  background:#137547;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 7px;
+  background: #137547;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-button:disabled { opacity:.6; }
+button:disabled { opacity: .6; }
 
 .switch {
-  background:none;
-  color:#137547;
-  text-decoration:underline;
+  background: none;
+  color: #137547;
+  text-decoration: underline;
 }
 
 .secondary {
-  background:#e8f3ec;
-  color:#137547;
+  background: #e8f3ec;
+  color: #137547;
 }
 
 .message {
-  padding:12px;
-  border-radius:7px;
-  margin:12px 0;
-  display:none;
-  line-height:1.5;
-  overflow-wrap:anywhere;
+  padding: 12px;
+  border-radius: 7px;
+  margin: 12px 0;
+  display: none;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .success {
-  background:#e5f7eb;
-  color:#126334;
+  background: #e5f7eb;
+  color: #126334;
 }
 
 .error {
-  background:#ffe8e8;
-  color:#a40000;
+  background: #ffe8e8;
+  color: #a40000;
 }
 
 .show-password {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin:8px 0;
-  font-size:14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 14px;
 }
 
 .show-password input {
-  width:auto;
-  margin:0;
+  width: auto;
+  margin: 0;
 }
 
 .small {
-  color:#666;
-  font-size:14px;
-  line-height:1.5;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
 }
 </style>
 </head>
@@ -118,12 +118,12 @@ role="status" aria-live="polite"></div>
 
 <div id="nameField">
 <input id="fullName" type="text"
-placeholder="Full name">
+placeholder="Full name" required>
 </div>
 
 <div id="phoneField">
 <input id="phone" type="tel"
-placeholder="WhatsApp number">
+placeholder="WhatsApp number" required>
 </div>
 
 <input id="email" type="email"
@@ -135,7 +135,7 @@ required>
 
 <div id="confirmField">
 <input id="confirmPassword" type="password"
-placeholder="Confirm password">
+placeholder="Confirm password" required>
 </div>
 
 <label class="show-password">
@@ -169,7 +169,11 @@ Gauteng Rentals – Rooms and Rentals in Gauteng.
 <script src="supabase.js"></script>
 
 <script>
-const client = window.supabaseClient;
+(function () {
+"use strict";
+
+// Supabase connection from supabase.js
+const authClient = window.supabaseClient;
 
 const form = document.getElementById("authForm");
 const heading = document.getElementById("heading");
@@ -192,13 +196,14 @@ const showPassword = document.getElementById("showPassword");
 let loginMode = false;
 let resetMode = false;
 
-function showMessage(text,type) {
+function showMessage(text, type) {
   message.textContent = text;
   message.className = "message " + type;
   message.style.display = "block";
 }
 
 function clearMessage() {
+  message.textContent = "";
   message.style.display = "none";
 }
 
@@ -221,9 +226,13 @@ function setLoginMode(value) {
   fullName.required = !loginMode;
   phone.required = !loginMode;
   confirmPassword.required = !loginMode;
+  email.required = true;
+  password.required = true;
 
   email.style.display = "block";
   password.style.display = "block";
+
+  password.placeholder = "Password (minimum 8 characters)";
 
   forgotButton.style.display = loginMode ? "block" : "none";
   switchButton.style.display = "block";
@@ -247,41 +256,48 @@ function setResetMode() {
 
   nameField.style.display = "none";
   phoneField.style.display = "none";
-
   email.style.display = "none";
-  confirmField.style.display = "block";
 
+  confirmField.style.display = "block";
   password.style.display = "block";
-  password.placeholder = "Enter your new password";
+
+  email.required = false;
+  fullName.required = false;
+  phone.required = false;
 
   password.required = true;
   confirmPassword.required = true;
 
-  fullName.required = false;
-  phone.required = false;
+  password.placeholder = "Enter your new password";
 
   forgotButton.style.display = "none";
   switchButton.style.display = "none";
 
+  showPassword.checked = false;
+  password.type = "password";
+  confirmPassword.type = "password";
+
   submitButton.textContent = "Save New Password";
 }
 
-switchButton.addEventListener("click",function() {
+// Switch between registration and login
+switchButton.addEventListener("click", function () {
   setLoginMode(!loginMode);
-  password.placeholder = "Password (minimum 8 characters)";
   clearMessage();
 });
 
-showPassword.addEventListener("change",function() {
-  const type = this.checked ? "text" : "password";
+// Show or hide both password fields
+showPassword.addEventListener("change", function () {
+  const type = showPassword.checked ? "text" : "password";
+
   password.type = type;
   confirmPassword.type = type;
 });
 
-// Check whether Supabase returned a password recovery link
+// Check Supabase recovery and confirmation links
 const queryParams = new URLSearchParams(window.location.search);
 const hashParams = new URLSearchParams(
-  window.location.hash.replace(/^#/,"")
+  window.location.hash.replace(/^#/, "")
 );
 
 const recoveryError =
@@ -298,16 +314,12 @@ const confirmationReturned =
 
 if (recoveryError) {
   setLoginMode(true);
-  showMessage(
-    "Password recovery link error: " + recoveryError,
-    "error"
-  );
+  showMessage("Recovery link error: " + recoveryError, "error");
+
 } else if (recoveryReturned) {
   setResetMode();
-  showMessage(
-    "Enter your new password below.",
-    "success"
-  );
+  showMessage("Enter your new password below.", "success");
+
 } else if (confirmationReturned) {
   setLoginMode(true);
   showMessage(
@@ -317,10 +329,10 @@ if (recoveryError) {
 }
 
 // Forgot password
-forgotButton.addEventListener("click",async function() {
+forgotButton.addEventListener("click", async function () {
 
-  if (!client) {
-    showMessage("Supabase connection is missing.","error");
+  if (!authClient) {
+    showMessage("Supabase connection is missing.", "error");
     return;
   }
 
@@ -339,13 +351,11 @@ forgotButton.addEventListener("click",async function() {
   forgotButton.textContent = "Sending...";
 
   try {
-    const { error } = await client.auth.resetPasswordForEmail(
-      userEmail,
-      {
+    const { error } =
+      await authClient.auth.resetPasswordForEmail(userEmail, {
         redirectTo:
           "https://oyisatech.github.io/Rooms-and-rentals-in-Gauteng-/landlord.html?mode=reset"
-      }
-    );
+      });
 
     if (error) throw error;
 
@@ -354,24 +364,28 @@ forgotButton.addEventListener("click",async function() {
       "success"
     );
 
-  } catch(error) {
+  } catch (error) {
     showMessage(
       "Could not request password reset: " + error.message,
       "error"
     );
+
   } finally {
     forgotButton.disabled = false;
     forgotButton.textContent = "Forgot Password?";
   }
 });
 
-// Register, login or save new password
-form.addEventListener("submit",async function(event) {
+// Register, login or change password
+form.addEventListener("submit", async function (event) {
 
   event.preventDefault();
 
-  if (!client) {
-    showMessage("Supabase connection is missing.","error");
+  if (!authClient) {
+    showMessage(
+      "Supabase connection is missing. Check supabase.js.",
+      "error"
+    );
     return;
   }
 
@@ -379,7 +393,6 @@ form.addEventListener("submit",async function(event) {
   submitButton.textContent = "Please wait...";
 
   try {
-
     const userEmail = email.value.trim();
     const userPassword = password.value;
 
@@ -393,17 +406,15 @@ form.addEventListener("submit",async function(event) {
         throw new Error("Your new passwords do not match.");
       }
 
-      const { error } = await client.auth.updateUser({
-        password:userPassword
+      const { error } = await authClient.auth.updateUser({
+        password: userPassword
       });
 
       if (error) throw error;
 
-      await client.auth.signOut();
+      await authClient.auth.signOut();
 
       setLoginMode(true);
-
-      password.placeholder = "Password (minimum 8 characters)";
 
       showMessage(
         "Password changed successfully! You can now log in with your new password.",
@@ -412,9 +423,9 @@ form.addEventListener("submit",async function(event) {
 
     } else if (loginMode) {
 
-      const { error } = await client.auth.signInWithPassword({
-        email:userEmail,
-        password:userPassword
+      const { error } = await authClient.auth.signInWithPassword({
+        email: userEmail,
+        password: userPassword
       });
 
       if (error) throw error;
@@ -432,14 +443,14 @@ form.addEventListener("submit",async function(event) {
         throw new Error("Your passwords do not match.");
       }
 
-      const { data,error } = await client.auth.signUp({
-        email:userEmail,
-        password:userPassword,
-        options:{
-          data:{
-            full_name:fullName.value.trim(),
-            phone:phone.value.trim(),
-            role:"landlord"
+      const { data, error } = await authClient.auth.signUp({
+        email: userEmail,
+        password: userPassword,
+        options: {
+          data: {
+            full_name: fullName.value.trim(),
+            phone: phone.value.trim(),
+            role: "landlord"
           },
           emailRedirectTo:
             "https://oyisatech.github.io/Rooms-and-rentals-in-Gauteng-/landlord.html"
@@ -462,28 +473,31 @@ form.addEventListener("submit",async function(event) {
       }
     }
 
-  } catch(error) {
-    showMessage(error.message,"error");
+  } catch (error) {
+    showMessage(error.message, "error");
+
   } finally {
     submitButton.disabled = false;
 
-    if (!resetMode) {
-      submitButton.textContent = loginMode ? "Log In" : "Register";
-    } else {
+    if (resetMode) {
       submitButton.textContent = "Save New Password";
+    } else {
+      submitButton.textContent = loginMode ? "Log In" : "Register";
     }
   }
 });
 
-// Set initial screen
+// Initial registration screen
 if (!recoveryReturned && !recoveryError && !confirmationReturned) {
   setLoginMode(false);
 }
 
+})();
 </script>
 
 </body>
-</html>
+  </html>
+  
 
 
   
