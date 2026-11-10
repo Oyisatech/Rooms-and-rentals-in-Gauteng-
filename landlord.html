@@ -148,7 +148,11 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+if (!loginMode && password !== confirmPassword) {
+  throw new Error("Passwords do not match. Please try again.");
+}
 
     if (loginMode) {
       const { data, error } =
