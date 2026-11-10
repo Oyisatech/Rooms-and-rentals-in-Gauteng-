@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landlord Dashboard | Gauteng Rentals</title>
+<link rel="stylesheet" href="style.css">
+<style>
+main { max-width:900px; margin:35px auto; padding:20px; }
+.panel { background:white; padding:22px; border-radius:12px; margin-bottom:25px; box-shadow:0 3px 15px #0000000d; }
+.panel input, .panel textarea, .panel select {
+  width:100%; padding:13px; margin:8px 0 15px;
+  border:1px solid #ddd; border-radius:7px; font-size:15px;
+}
+.panel button {
+  background:#123b32; color:white; border:0;
+  border-radius:7px; padding:13px 20px; font-weight:bold;
+}
+.listing { border:1px solid #e5e5e5; padding:15px; border-radius:9px; margin:12px 0; }
+.status { font-weight:bold; color:#9b7014; }
+#message { margin-top:15px; overflow-wrap:anywhere; }
+</style>
+</head>
+<body>
+
+<header>
+<a href="index.html" class="logo">🏠 Gauteng Rentals</a>
+<button id="logoutButton">Logout</button>
+</header>
+
+<main>
+<h1>Landlord Dashboard</h1>
+<p>Manage your rental advertisements.</p>
+
+<section class="panel">
+<h2>Advertise a property</h2>
+
+<form id="propertyForm">
+
+<label>Property title</label>
+<input id="title" required maxlength="100"
+placeholder="e.g. Spacious room in Roodepoort">
+
+<label>Property category</label>
+<select id="category" required>
+<option value="">Select category</option>
+<option>Room</option>
+<option>Flat</option>
+<option>Apartment</option>
+<option>House</option>
+</select>
+
+<label>City or town</label>
+<input id="city" required placeholder="e.g. Johannesburg">
+
+<label>Suburb</label>
+<input id="suburb" placeholder="e.g. Roodepoort">
+
+<label>Monthly rent (R)</label>
+<input id="rent" type="number" min="1" required placeholder="2500">
+
+<label>Bedrooms</label>
+<input id="bedrooms" type="number" min="0" value="1">
+
+<label>Bathrooms</label>
+<input id="bathrooms" type="number" min="0" value="1">
+
+<label>WhatsApp phone number</label>
+<input id="phone" type="tel" required placeholder="e.g. 0821234567">
+
+<label>Property description</label>
+<textarea id="description" rows="4" maxlength="2000"
+placeholder="Describe the property, facilities and rental conditions"></textarea>
+
+<label>Property photo URL (optional)</label>
+<input id="photo" type="url" placeholder="https://example.com/photo.jpg">
+
+<button type="submit" id="submitButton">Submit property</button>
+<p id="message" role="status" aria-live="polite"></p>
+
+</form>
+</section>
+
+<section class="panel">
+<h2>My property listings</h2>
+<div id="myProperties">Loading your properties...</div>
+</section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<script>
+const db = window.supabaseClient;
+const message = document.getElementById("message");
+let currentUser = null;
+
+async function startDashboard() {
+  const { data, error } = await db.auth.getUser();
+
+  if (error || !data.user) {
+    window.location.replace("landlord.html");
+    return;
+  }
+
+  currentUser = data.user;
+  loadMyProperties();
+}
+
+async function loadMyProperties() {
+  const container = document.getElementById("myProperties");
+
+  const { data, error } = await db
+    .from("properties")
+    .select("*")
+    .eq("owner_id", currentUser.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    container.textContent = "Could not load listings: " + error.message;
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    container.textContent = "You haven't submitted any properties yet.";
+    return;
+  }
+
+  data.forEach(property => {
+    const card = document.createElement("div");
+    card.className = "listing";
+
+    const title = document.createElement("h3");
+    title.textContent = property.title;
+
+    const location = document.createElement("p");
+    location.textContent = [property.suburb, property.city]
+      .filter(Boolean).join(", ");
+
+    const price = document.createElement("p");
+    price.textContent = "R" + Number(property.rent).toLocaleString("en-ZA") + " per month";
+
+    const status = document.createElement("p");
+    status.className = "status";
+    status.textContent = "Status: " + property.status;
+
+    card.append(title, location, price, status);
+    container.appendChild(card);
+  });
+}
+
+document.getElementById("propertyForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const button = document.getElementById("submitButton");
+  button.disabled = true;
+  message.textContent = "Submitting your property...";
+
+  try {
+    const photo = document.getElementById("photo").value.trim();
+
+    const listing = {
+      owner_id: currentUser.id,
+      title: document.getElementById("title").value.trim(),
+      category: document.getElementById("category").value,
+      province: "Gauteng",
+      city: document.getElementById("city").value.trim(),
+      suburb: document.getElementById("suburb").value.trim(),
+      rent: Number(document.getElementById("rent").value),
+      bedrooms: Number(document.getElementById("bedrooms").value),
+      bathrooms: Number(document.getElementById("bathrooms").value),
+      contact_phone: document.getElementById("phone").value.trim(),
+      description: document.getElementById("description").value.trim(),
+      image_urls: photo ? [photo] : [],
+      status: "pending"
+    };
+
+    const { error } = await db
+      .from("properties")
+      .insert(listing);
+
+    if (error) throw error;
+
+    message.textContent =
+      "Success! Your property has been submitted for admin approval.";
+
+    event.target.reset();
+    await loadMyProperties();
+
+  } catch (error) {
+    message.textContent = "Submission failed: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  window.location.replace("landlord.html");
+});
+
+startDashboard();
+</script>
+
+</body>
+</html>
