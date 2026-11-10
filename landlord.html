@@ -11,6 +11,7 @@
 
 <style>
 .auth-container {
+  box-sizing: border-box;
   max-width: 480px;
   margin: 55px auto;
   padding: 25px;
@@ -19,8 +20,13 @@
   box-shadow: 0 5px 25px rgba(0,0,0,.07);
 }
 
-.auth-container h1 { margin-bottom: 10px; }
-.auth-container p { color: #68766f; }
+.auth-container h1 {
+  margin-bottom: 10px;
+}
+
+.auth-container p {
+  color: #68766f;
+}
 
 .auth-container input:not([type="checkbox"]) {
   box-sizing: border-box;
@@ -41,10 +47,12 @@
   border: none;
   border-radius: 7px;
   font-size: 16px;
+  cursor: pointer;
 }
 
 .auth-container button:disabled {
   opacity: .6;
+  cursor: not-allowed;
 }
 
 .switch {
@@ -58,17 +66,24 @@
   padding: 5px;
 }
 
-#message {
-  margin-top: 15px;
-  overflow-wrap: anywhere;
-}
-
 .password-option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 8px 0;
+  gap: 9px;
+  margin: 12px 0;
   font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.password-option input {
+  width: 18px;
+  height: 18px;
+}
+
+#message {
+  margin-top: 15px;
+  overflow-wrap: anywhere;
 }
 </style>
 </head>
@@ -91,27 +106,47 @@ Create an account to advertise your property.
 <form id="authForm">
 
 <div id="nameField">
-<input id="fullName" type="text"
-placeholder="Full name" required>
+<input
+id="fullName"
+type="text"
+placeholder="Full name"
+autocomplete="name"
+required>
 </div>
 
 <div id="phoneField">
-<input id="phone" type="tel"
-placeholder="WhatsApp number" required>
+<input
+id="phone"
+type="tel"
+placeholder="WhatsApp number"
+autocomplete="tel"
+required>
 </div>
 
-<input id="email" type="email"
-placeholder="Email address" required>
+<input
+id="email"
+type="email"
+placeholder="Email address"
+autocomplete="email"
+required>
 
-<input id="password" type="password"
+<input
+id="password"
+type="password"
 placeholder="Password (minimum 8 characters)"
-minlength="8" required>
+minlength="8"
+autocomplete="new-password"
+required>
 
 <div id="confirmField">
 
-<input id="confirmPassword" type="password"
+<input
+id="confirmPassword"
+type="password"
 placeholder="Confirm password"
-minlength="8" required>
+minlength="8"
+autocomplete="new-password"
+required>
 
 </div>
 
@@ -129,11 +164,15 @@ Create account
 <p id="message" role="status" aria-live="polite"></p>
 
 <div class="switch">
-<p id="switchText">Already have an account?</p>
+
+<p id="switchText">
+Already have an account?
+</p>
 
 <button type="button" id="switchButton">
 Login here
 </button>
+
 </div>
 
 </div>
@@ -143,25 +182,36 @@ Login here
 
 <script>
 
+// Elements
+
 const form = document.getElementById("authForm");
 const message = document.getElementById("message");
 
+const passwordInput = document.getElementById("password");
+const confirmPasswordInput =
+document.getElementById("confirmPassword");
+
+const showPasswordCheckbox =
+document.getElementById("showPassword");
+
 let loginMode = false;
 
-// Show or hide passwords
 
-document.getElementById("showPassword").onchange = function() {
+// SHOW AND HIDE PASSWORDS
 
-  const type = this.checked ? "text" : "password";
+showPasswordCheckbox.addEventListener("change", function() {
 
-  document.getElementById("password").type = type;
-  document.getElementById("confirmPassword").type = type;
+  const passwordType = this.checked ? "text" : "password";
 
-};
+  passwordInput.type = passwordType;
+  confirmPasswordInput.type = passwordType;
 
-// Switch between registration and login
+});
 
-document.getElementById("switchButton").onclick = () => {
+
+// SWITCH BETWEEN REGISTRATION AND LOGIN
+
+document.getElementById("switchButton").onclick = function() {
 
   loginMode = !loginMode;
 
@@ -179,12 +229,12 @@ document.getElementById("switchButton").onclick = () => {
 
   document.getElementById("fullName").required = !loginMode;
   document.getElementById("phone").required = !loginMode;
-  document.getElementById("confirmPassword").required = !loginMode;
+  confirmPasswordInput.required = !loginMode;
 
-  document.getElementById("showPassword").checked = false;
+  showPasswordCheckbox.checked = false;
 
-  document.getElementById("password").type = "password";
-  document.getElementById("confirmPassword").type = "password";
+  passwordInput.type = "password";
+  confirmPasswordInput.type = "password";
 
   document.getElementById("submitButton").textContent =
     loginMode ? "Login" : "Create account";
@@ -199,9 +249,10 @@ document.getElementById("switchButton").onclick = () => {
 
 };
 
-// Registration and login
 
-form.addEventListener("submit", async (event) => {
+// REGISTRATION AND LOGIN
+
+form.addEventListener("submit", async function(event) {
 
   event.preventDefault();
 
@@ -212,20 +263,29 @@ form.addEventListener("submit", async (event) => {
 
   try {
 
+    // Check Supabase connection
+
     if (!window.supabaseClient) {
       throw new Error(
-        "Supabase connection not found. Please refresh the page."
+        "Supabase connection failed. Please refresh the page."
       );
     }
 
     const email =
       document.getElementById("email").value.trim();
 
-    const password =
-      document.getElementById("password").value;
+    const password = passwordInput.value;
 
-    const confirmPassword =
-      document.getElementById("confirmPassword").value;
+    const confirmPassword = confirmPasswordInput.value;
+
+
+    // PASSWORD VALIDATION
+
+    if (!loginMode && password.length < 8) {
+      throw new Error(
+        "Password must contain at least 8 characters."
+      );
+    }
 
     if (!loginMode && password !== confirmPassword) {
       throw new Error(
@@ -233,12 +293,17 @@ form.addEventListener("submit", async (event) => {
       );
     }
 
+
+    // LANDLORD LOGIN
+
     if (loginMode) {
 
       const { data, error } =
         await window.supabaseClient.auth.signInWithPassword({
-          email,
-          password
+
+          email: email,
+          password: password
+
         });
 
       if (error) throw error;
@@ -248,7 +313,12 @@ form.addEventListener("submit", async (event) => {
 
       window.location.href = "dashboard.html";
 
-    } else {
+    }
+
+
+    // LANDLORD REGISTRATION
+
+    else {
 
       const fullName =
         document.getElementById("fullName").value.trim();
@@ -256,16 +326,22 @@ form.addEventListener("submit", async (event) => {
       const phone =
         document.getElementById("phone").value.trim();
 
+      if (!fullName || !phone) {
+        throw new Error(
+          "Please enter your full name and WhatsApp number."
+        );
+      }
+
       const { data, error } =
         await window.supabaseClient.auth.signUp({
 
-          email,
-          password,
+          email: email,
+          password: password,
 
           options: {
 
             emailRedirectTo:
-              https://oyisatech.github.io/Rooms-and-rentals-in-Gauteng-/
+              "https://oyisatech.github.io/Rooms-and-rentals-in-Gauteng-/landlord.html",
 
             data: {
               full_name: fullName,
@@ -282,7 +358,7 @@ form.addEventListener("submit", async (event) => {
       if (data.session) {
 
         message.textContent =
-          "Account created successfully!";
+          "Account created successfully! You can now continue.";
 
       } else {
 
@@ -293,11 +369,15 @@ form.addEventListener("submit", async (event) => {
 
     }
 
-  } catch (error) {
+  }
+
+  catch(error) {
 
     message.textContent = error.message;
 
-  } finally {
+  }
+
+  finally {
 
     button.disabled = false;
 
@@ -308,6 +388,7 @@ form.addEventListener("submit", async (event) => {
 </script>
 
 </body>
-</html>
+  </html>
+  
 
   
