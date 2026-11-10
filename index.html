@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rooms and Rentals - Find a Room in Roodepoort</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+body { background:#f2f2f2; }
+header { background:#111; color:white; padding:20px; text-align:center; }
+header h1 { font-size:28px; }
+header h1 span { color:#25D366; }
+header p { color:#ccc; margin-top:5px; }
+.search { background:white; padding:15px; margin:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+.search input, .search select { width:100%; padding:12px; margin:6px 0; border:1px solid #ddd; border-radius:8px; font-size:16px; }
+.search button { width:100%; background:#25D366; color:white; border:none; padding:13px; border-radius:8px; font-size:17px; font-weight:bold; cursor:pointer; }
+.rooms { display:grid; grid-template-columns:1fr; gap:15px; padding:0 15px 20px; }
+.card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+.card img { width:100%; height:200px; object-fit:cover; }
+.card-body { padding:15px; }
+.price { color:#111; font-size:22px; font-weight:bold; }
+.price small { color:#777; font-size:13px; font-weight:normal; }
+.location { color:#555; margin:5px 0; }
+.tags { margin:8px 0; }
+.tag { display:inline-block; background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:20px; font-size:12px; margin-right:5px; }
+.wa { display:block; background:#25D366; color:white; text-align:center; padding:12px; border-radius:8px; text-decoration:none; font-weight:bold; margin-top:10px; }
+.list-btn { display:block; background:#111; color:white; text-align:center; padding:14px; border-radius:10px; text-decoration:none; font-weight:bold; margin:0 15px 20px; }
+footer { text-align:center; padding:20px; color:#777; font-size:13px; }
+@media(min-width:600px){ .rooms{grid-template-columns:1fr 1fr;} }
+@media(min-width:900px){ .rooms{grid-template-columns:1fr 1fr 1fr;} .search{display:flex; gap:10px;} .search input,.search select,.search button{margin:0;} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Rooms <span>& Rentals</span></h1>
+  <p>Find a Room in Roodepoort, Florida & Fleurhof - No Scams, Direct to Landlord</p>
+</header>
+
+<div class="search">
+  <input type="text" id="searchInput" placeholder="Search area... e.g. Roodepoort">
+  <select id="priceFilter">
+    <option value="99999">Any Price</option>
+    <option value="1500">Under R1500</option>
+    <option value="2000">Under R2000</option>
+    <option value="2500">Under R2500</option>
+  </select>
+  <button onclick="filterRooms()">Search Rooms</button>
+</div>
+
+<div class="rooms" id="roomsList">
+
+  <div class="card" data-area="roodepoort" data-price="1800">
+    <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800" alt="Cottage">
+    <div class="card-body">
+      <div class="price">R1800 <small>/month</small></div>
+      <div class="location">📍 Cottage - Roodepoort</div>
+      <div class="tags"><span class="tag">Water Included</span><span class="tag">Safe</span><span class="tag">Close to Taxi</span></div>
+      <p>1 Bedroom cottage, own bathroom, secure yard. Perfect for single person working in Roodepoort.</p>
+      <a class="wa" href="https://wa.me/27600000000?text=Hi, I saw your R1800 Cottage in Roodepoort on Rooms and Rentals. Is it still available?">WhatsApp Landlord</a>
+    </div>
+  </div>
+
+  <div class="card" data-area="fleurhof" data-price="1500">
+    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800" alt="Room">
+    <div class="card-body">
+      <div class="price">R1500 <small>/month</small></div>
+      <div class="location">📍 Room - Fleurhof</div>
+      <div class="tags"><span class="tag">Water & Lights</span><span class="tag">Shared Kitchen</span></div>
+      <p>Spacious room in Fleurhof, close to shops. Water and lights included. First come, first serve.</p>
+      <a class="wa" href="https://wa.me/27600000000?text=Hi, I am interested in the R1500 Room in Fleurhof">WhatsApp Landlord</a>
+    </div>
+  </div>
+
+  <div class="card" data-area="florida" data-price="2200">
+    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800" alt="Flat">
+    <div class="card-body">
+      <div class="price">R2200 <small>/month</small></div>
+      <div class="location">📍 Bachelor Flat - Florida, Roodepoort</div>
+      <div class="tags"><span class="tag">Own Toilet</span><span class="tag">Prepaid</span></div>
+      <p>Bachelor flat with own toilet and kitchen. Safe complex, 5 min from Florida Lake.</p>
+      <a class="wa" href="https://wa.me/27600000000?text=Hi, is the R2200 Bachelor in Florida still available?">WhatsApp Landlord</a>
+    </div>
+  </div>
+
+  <div class="card" data-area="krugersdorp" data-price="2000">
+    <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800" alt="Room">
+    <div class="card-body">
+      <div class="price">R2000 <small>/month</small></div>
+      <div class="location">📍 Room - Krugersdorp Central</div>
+      <div class="tags"><span class="tag">Furnished</span><span class="tag">WiFi</span></div>
+      <p>Furnished room, bed + wardrobe included. WiFi available. Close to Krugersdorp CBD.</p>
+      <a class="wa" href="https://wa.me/27600000000?text=Hi, I want the R2000 Room in Krugersdorp">WhatsApp Landlord</a>
+    </div>
+  </div>
+
+  <div class="card" data-area="roodepoort" data-price="2500">
+    <img src="https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=800" alt="Cottage">
+    <div class="card-body">
+      <div class="price">R2500 <small>/month</small></div>
+      <div class="location">📍 2 Room - Roodepoort West</div>
+      <div class="tags"><span class="tag">Family</span><span class="tag">Big Yard</span></div>
+      <p>2 Room house, good for small family. Big yard, safe area, near school and taxi rank.</p>
+      <a class="wa" href="https://wa.me/27600000000?text=Hi, I am interested in the R2500 2 Room in Roodepoort">WhatsApp Landlord</a>
+    </div>
+  </div>
+
+  <div class="card" data-area="dobsonville" data-price="1300">
+    <img src="https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800" alt="Backroom">
+    <div class="card-body">
+      <div class="price">R1300 <small>/month</small></div>
+      <div class="location">📍 Backroom - Dobsonville</div>
+      <div class="tags"><span class="tag">Budget</span><span class="tag">Water Included</span></div>
+      <p>Clean backroom in Dobsonville. Water included, lights prepaid. Quiet yard.</p>
+      <a class="wa" href="https://wa.me/27600000000?text=Hi, is the R1300 Backroom in Dobsonville available?">WhatsApp Landlord</a>
+    </div>
+  </div>
+
+</div>
+
+<a class="list-btn" href="https://forms.gle/your-google-form-link">+ List Your Room - FREE for First Month</a>
+
+<footer>
+  Made by OyisaTech | Rooms and Rentals - Roodepoort<br>
+  All landlords are verified by WhatsApp before listing.
+</footer>
+
+<script>
+function filterRooms(){
+  let search = document.getElementById('searchInput').value.toLowerCase();
+  let maxPrice = parseInt(document.getElementById('priceFilter').value);
+  let cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+    let area = card.getAttribute('data-area');
+    let price = parseInt(card.getAttribute('data-price'));
+    let show = area.includes(search) && price <= maxPrice;
+    card.style.display = show ? 'block' : 'none';
+  });
+}
+</script>
+
+</body>
+    </html>
